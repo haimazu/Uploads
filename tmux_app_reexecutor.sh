@@ -25,14 +25,17 @@ for session in $(tmux list-sessions -F "#{session_name}"); do
     # Capture the last 10 lines from the session
     session_output=$(tmux capture-pane -pt "$session" -S -10)
 
-    # Check if any pattern matches
-    if echo "$session_output" | grep -E -m 1 -q "$(IFS="|"; echo "${PATTERNS[*]}")"; then
+    # Check for a match
+    matching_line=$(echo "$session_output" | grep -E -m 1 "$(IFS="|"; echo "${PATTERNS[*]}")")
+
+    if [[ -n "$matching_line" ]]; then
         echo "Pattern found in session: $session"
+        echo "Matching line: $matching_line"
 
         # Clear the console
         tmux send-keys -t "$session" "clear" C-m
 
-        # Execute the command only once per session
+        # Execute the command
         echo "Executing command in session: $session"
         tmux send-keys -t "$session" "python3 main.py $session --env prod" C-m
         echo "Command executed successfully in session: $session"
