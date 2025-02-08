@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### Tmux Monitor & Command Executor
+#### Tmux Monitor & Command Executor 🚀
 
 echo "Starting tmux session monitor..."
 
@@ -23,7 +23,7 @@ PATTERNS=(
 # Iterate through tmux sessions
 for session in $(tmux list-sessions -F "#{session_name}"); do
     # Capture the last 100 lines from the session to avoid excessive output
-    session_output=$(tmux capture-pane -pt "$session" -S -100)
+    session_output=$(tmux capture-pane -pt "$session" -S -10)
 
     # Check if any pattern matches
     for pattern in "${PATTERNS[@]}"; do
@@ -38,10 +38,11 @@ for session in $(tmux list-sessions -F "#{session_name}"); do
             tmux send-keys -t "$session" "python3 main.py $session --env prod" C-m
             echo "Command executed successfully in session: $session"
 
-            # Exit loop after first match
+            # Stop checking further patterns for this session, but continue with others
             break
         fi
     done
 done
 
 echo "Finished processing tmux sessions."
+exit 0
