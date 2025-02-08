@@ -22,7 +22,7 @@ PATTERNS=(
 
 # Iterate through tmux sessions
 for session in $(tmux list-sessions -F "#{session_name}"); do
-    # Capture the last 100 lines from the session to avoid excessive output
+    # Capture the last 10 lines from the session to avoid excessive output
     session_output=$(tmux capture-pane -pt "$session" -S -10)
 
     # Check if any pattern matches
