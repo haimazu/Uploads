@@ -22,26 +22,21 @@ PATTERNS=(
 
 # Iterate through tmux sessions
 for session in $(tmux list-sessions -F "#{session_name}"); do
-    # Capture the last 10 lines from the session to avoid excessive output
+    # Capture the last 10 lines from the session
     session_output=$(tmux capture-pane -pt "$session" -S -10)
 
     # Check if any pattern matches
-    for pattern in "${PATTERNS[@]}"; do
-        if echo "$session_output" | grep -E -q "$pattern"; then
-            echo "Pattern '$pattern' found in session: $session"
+    if echo "$session_output" | grep -E -m 1 -q "$(IFS="|"; echo "${PATTERNS[*]}")"; then
+        echo "Pattern found in session: $session"
 
-            # Clear the console
-            tmux send-keys -t "$session" "clear" C-m
+        # Clear the console
+        tmux send-keys -t "$session" "clear" C-m
 
-            # Execute the command
-            echo "Executing command in session: $session"
-            tmux send-keys -t "$session" "python3 main.py $session --env prod" C-m
-            echo "Command executed successfully in session: $session"
-
-            # Stop checking further patterns for this session, but continue with others
-            break
-        fi
-    done
+        # Execute the command only once per session
+        echo "Executing command in session: $session"
+        tmux send-keys -t "$session" "python3 main.py $session --env prod" C-m
+        echo "Command executed successfully in session: $session"
+    fi
 done
 
 echo "Finished processing tmux sessions."
