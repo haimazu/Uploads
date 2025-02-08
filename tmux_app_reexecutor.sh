@@ -17,7 +17,6 @@ PATTERNS=(
     "Interrupted! Exiting gracefully!"
     "Visibility timeout changed successfully to 0 SECONDS"
     "Changed status of .* to IN_QUEUE."
-    "sling@sling:~/slingshot\\$"
 )
 
 # Iterate through tmux sessions
@@ -38,6 +37,11 @@ for session in $(tmux list-sessions -F "#{session_name}"); do
         # Execute the command
         echo "Executing command in session: $session"
         tmux send-keys -t "$session" "python3 main.py $session --env prod" C-m
+        
+        # Immediately clear the pane after execution to remove matching line
+        sleep 1  # Give the command time to execute
+        tmux clear-history -t "$session"
+        
         echo "Command executed successfully in session: $session"
     fi
 done
