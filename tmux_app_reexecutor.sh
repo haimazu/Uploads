@@ -1,19 +1,12 @@
 #!/bin/bash
 
-#### Pro-Level tmux Monitor & Command Executor 🚀
+#### Tmux Monitor & Command Executor
 
-LOG_FILE="/var/log/tmux_monitor.log"
-
-# Function to log messages
-log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
-}
-
-log_message "Starting tmux session monitor..."
+echo "Starting tmux session monitor..."
 
 # Check if there are any tmux sessions running
 if ! tmux list-sessions &>/dev/null; then
-    log_message "No tmux sessions found."
+    echo "No tmux sessions found."
     exit 0
 fi
 
@@ -35,15 +28,15 @@ for session in $(tmux list-sessions -F "#{session_name}"); do
     # Check if any pattern matches
     for pattern in "${PATTERNS[@]}"; do
         if echo "$session_output" | grep -E -q "$pattern"; then
-            log_message "Pattern '$pattern' found in session: $session"
+            echo "Pattern '$pattern' found in session: $session"
 
             # Clear the console
             tmux send-keys -t "$session" "clear" C-m
 
             # Execute the command
-            log_message "Executing command in session: $session"
+            echo "Executing command in session: $session"
             tmux send-keys -t "$session" "python3 main.py $session --env prod" C-m
-            log_message "Command executed successfully in session: $session"
+            echo "Command executed successfully in session: $session"
 
             # Exit loop after first match
             break
@@ -51,4 +44,4 @@ for session in $(tmux list-sessions -F "#{session_name}"); do
     done
 done
 
-log_message "Finished processing tmux sessions."
+echo "Finished processing tmux sessions."
