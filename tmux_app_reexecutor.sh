@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### Tmux Monitor & Command Executor 🚀
+#### Tmux Monitor & Command Executor
 
 echo "Starting tmux session monitor..."
 
