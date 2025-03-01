@@ -43,6 +43,6 @@ done
 
 # Start Slingshot Tmux Sessions using create_tmux_sessions.sh
 NUM_SLINGSHOT_SESSIONS=3
-bash "$HOME/mikos/create_tmux_sessions.sh $NUM_SLINGSHOT_SESSIONS"
+bash "$HOME/mikos/create_tmux_sessions.sh" "$NUM_SLINGSHOT_SESSIONS"
 
 send_telegram_message "$SCRIPT_NAME" "🚀 <b>All Tmux sessions started successfully!</b> 🎯"
