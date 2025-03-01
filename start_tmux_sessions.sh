@@ -37,7 +37,7 @@ declare -A SESSIONS=(
 )
 
 for session in "${!SESSIONS[@]}"; do
-    tmux new -d -s "$session ${SESSIONS[$session]}"
+    tmux new -d -s "$session" "${SESSIONS[$session]}"
     send_telegram_message "$SCRIPT_NAME" "✅ <b>Started Tmux session:</b> <code>$session</code>"
 done
 
