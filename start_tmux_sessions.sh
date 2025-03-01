@@ -11,13 +11,13 @@ SERVER_TYPE="OLD-SERVER"
 SCRIPT_NAME="$SERVER_TYPE - [STARTUP] ->"
 
 echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Initializing Tmux sessions..."
-send_telegram_message "$SCRIPT_NAME 🟢 <b>Initializing Tmux sessions...</b>"
+send_telegram_message "$SCRIPT_NAME" "🟢 <b>Initializing Tmux sessions...</b>"
 
 # Check if any tmux server is running and kill it
 if tmux ls >/dev/null 2>&1; then
     tmux kill-server
     echo "Killed Tmux server."
-    send_telegram_message "$SCRIPT_NAME 🛑 <b>Killed Tmux server.</b>"
+    send_telegram_message "$SCRIPT_NAME" "🛑 <b>Killed Tmux server.</b>"
 fi
 
 # Ensure ports 8005, 6800, and 24001 are free
@@ -25,7 +25,7 @@ PORTS=(8005 6800 24001)
 for PORT in "${PORTS[@]}"; do
     if lsof -ti :$PORT >/dev/null 2>&1; then
         lsof -ti :$PORT | xargs kill -9 2>/dev/null
-        send_telegram_message "$SCRIPT_NAME ⚠️ <b>Freed port:</b> $PORT"
+        send_telegram_message "$SCRIPT_NAME" "⚠️ <b>Freed port:</b> $PORT"
     fi
 done
 
@@ -38,11 +38,11 @@ declare -A SESSIONS=(
 
 for session in "${!SESSIONS[@]}"; do
     tmux new -d -s "$session ${SESSIONS[$session]}"
-    send_telegram_message "$SCRIPT_NAME ✅ <b>Started Tmux session:</b> <code>$session</code>"
+    send_telegram_message "$SCRIPT_NAME" "✅ <b>Started Tmux session:</b> <code>$session</code>"
 done
 
 # Start Slingshot Tmux Sessions using create_tmux_sessions.sh
 NUM_SLINGSHOT_SESSIONS=3
 bash "$HOME/mikos/create_tmux_sessions.sh $NUM_SLINGSHOT_SESSIONS"
 
-send_telegram_message "$SCRIPT_NAME 🚀 <b>All Tmux sessions started successfully!</b> 🎯"
+send_telegram_message "$SCRIPT_NAME" "🚀 <b>All Tmux sessions started successfully!</b> 🎯"
