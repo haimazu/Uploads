@@ -14,7 +14,7 @@ echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Initializing Tmux sessions..."
 send_telegram_message "$SCRIPT_NAME" "🟢 <b>Initializing Tmux sessions...</b>"
 
 # Check if any tmux server is running and kill it
-if tmux ls >/dev/null 2>&1; then
+if tmux list-sessions >/dev/null 2>&1; then
     tmux kill-server
     echo "Killed Tmux server."
 fi
