@@ -11,7 +11,7 @@ SERVER_TYPE="OLD-SERVER"
 SCRIPT_NAME="$SERVER_TYPE - [CLEANUP] -> "
 
 echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Temporary Files Cleanup Started"
-send_telegram_message "$SCRIPT_NAME" "🧹 <b>Temporary Files Cleanup Started</b> - Removing old `/tmp` folders."
+send_telegram_message "$SCRIPT_NAME" "🧹 <b>Temporary Files Cleanup Started</b> - Removing old /tmp folders."
 
 while true; do
     # Find and delete all /tmp/nuclei* folders older than 2 hours
@@ -34,13 +34,13 @@ while true; do
 
     
     if [[ "$deleted_nuclei" -gt 0 || "$deleted_wpscan" -gt 0 ]]; then
-        echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Cleanup Completed:\nDeleted $deleted_nuclei nuclei* folders.\nDeleted $deleted_wpscan wpscan folder."
+        echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Cleanup Completed: Deleted $deleted_nuclei nuclei* folder/s and $deleted_wpscan wpscan folder/s."
         send_telegram_message "$SCRIPT_NAME" "✅ <b>Cleanup Completed</b>:  
-        🗑️ Deleted <code>$deleted_nuclei</code> <b>nuclei*</b> folders.  
-        🗑️ Deleted <code>$deleted_wpscan</code> <b>wpscan</b> folder."
+        🗑️ Deleted <code>$deleted_nuclei</code> <b>nuclei*</b> folder/s.  
+        🗑️ Deleted <code>$deleted_wpscan</code> <b>wpscan</b> folder/s."
     else
-        echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Cleanup Skipped: No old temporary folders found."
-        send_telegram_message "$SCRIPT_NAME" "ℹ️ <b>Cleanup Skipped</b>: No old temporary folders found."
+        echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Cleanup Skipped: No old temporary folder/s found."
+        send_telegram_message "$SCRIPT_NAME" "ℹ️ <b>Cleanup Skipped</b>: No old temporary folder/s found."
     fi
 
     echo "Next cleanup in 12 hours..."
