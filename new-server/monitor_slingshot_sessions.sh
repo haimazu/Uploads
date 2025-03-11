@@ -51,6 +51,6 @@ while true; do
 
     echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Finished processing tmux sessions. Next check in 30 minutes."
     send_telegram_message "$SCRIPT_NAME" "Finished processing tmux sessions. 
-    ⏳ <b>Next check in 30 minutes</b>..."
+    <br>⏳ <b>Next check in 30 minutes</b>..."
     sleep 1800
 done
