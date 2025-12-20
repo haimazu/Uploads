@@ -28,10 +28,13 @@ for PORT in "${PORTS[@]}"; do
 done
 
 # Start Core Tmux Sessions (API, Crawler, Proxy)
+# Use ';' instead of '&&' so the session stays up even if the service exits/crashes
 declare -A SESSIONS=(
-    ["API"]="cd ~/slingshot/API_Service && gunicorn -w 2 -b :8005 app:app && exec bash"
-    ["crawler"]="cd ~/slingspider && scrapyd && exec bash"
-    ["proxy"]="cd ~/slingshot && proxy-manager && exec bash"
+    ["API"]="cd ~/slingshot/API_Service; gunicorn -w 2 -b :8005 app:app; exec bash"
+    ["crawler"]="cd ~/slingspider; scrapyd; exec bash"
+    ["proxy"]="cd ~/slingshot; proxy-manager; exec bash"
+    ["cleaner"]="~/mikos/cleanup_tmp_folders.sh"
+    ["monitor"]="~/mikos/monitor_slingshot_sessions.sh"
 )
 
 for session in "${!SESSIONS[@]}"; do
@@ -43,4 +46,44 @@ done
 NUM_SLINGSHOT_SESSIONS=10
 bash "$HOME/mikos/create_tmux_sessions.sh" "$NUM_SLINGSHOT_SESSIONS"
 
-send_telegram_message "$SCRIPT_NAME" "🚀 <b>All Tmux sessions started successfully!</b> 🎯"
+# Wait a moment for sessions to initialize
+sleep 10
+
+# Verify all expected core sessions exist and retry if missing
+EXPECTED_CORE_SESSIONS=("API" "crawler" "proxy" "cleaner" "monitor")
+MAX_RETRIES=3
+RETRY_DELAY=5
+
+for attempt in $(seq 1 $MAX_RETRIES); do
+    MISSING_SESSIONS=()
+    
+    for session in "${EXPECTED_CORE_SESSIONS[@]}"; do
+        if ! tmux has-session -t "$session" 2>/dev/null; then
+            MISSING_SESSIONS+=("$session")
+        fi
+    done
+    
+    # If all sessions exist, we're done
+    if [[ ${#MISSING_SESSIONS[@]} -eq 0 ]]; then
+        break
+    fi
+    
+    # If this is not the last attempt, retry creating missing sessions
+    if [[ $attempt -lt $MAX_RETRIES ]]; then
+        echo "$(date '+%d-%m-%Y %H:%M:%S,%3N') - Attempt $attempt/$MAX_RETRIES: Retrying creation of missing sessions: ${MISSING_SESSIONS[*]}"
+        for session in "${MISSING_SESSIONS[@]}"; do
+            if [[ -n "${SESSIONS[$session]:-}" ]]; then
+                tmux new -d -s "$session" "${SESSIONS[$session]}"
+                echo "Retried creating session: $session"
+            fi
+        done
+        sleep $RETRY_DELAY
+    fi
+done
+
+# Send appropriate message based on final verification
+if [[ ${#MISSING_SESSIONS[@]} -eq 0 ]]; then
+    send_telegram_message "$SCRIPT_NAME" "🚀 <b>All Tmux sessions started successfully!</b> 🎯"
+else
+    send_telegram_message "$SCRIPT_NAME" "⚠️ <b>Warning:</b> Failed to start after $MAX_RETRIES attempts: <code>${MISSING_SESSIONS[*]}</code>"
+fi
